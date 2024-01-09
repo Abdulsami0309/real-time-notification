@@ -5,52 +5,86 @@
     font-weight: 900;
     font-size: 22px;
 }
-#chat-messages{
+
+#chat-messages {
     height: 400px;
     overflow-y: scroll;
 }
 
-#chat-with-user-area{
+#chat-with-user-area {
     display: none;
 }
-.single-user{
+
+.single-user {
     cursor: pointer;
 }
-.offline-status{
-    color: red;
-}
-.online-status{
-    color: green;
-}
-#chat-messages{
+
+
+
+#chat-messages {
     display: flex;
     padding: 10px;
     flex-direction: column;
 }
-.current-user-message{
+
+.current-user-message {
     display: flex;
     justify-content: end;
     background: #ccc;
     padding: 10px;
+    align-items: center;
+    gap: 10px;
     border-radius: 10px;
     margin: 5px;
 }
-.recepient-user-message{
+
+.recepient-user-message {
     background: #ccc;
     padding: 10px;
     border-radius: 10px;
     margin: 5px;
 }
-.current-user-info-box{
+
+.current-user-info-box {
     display: flex;
     gap: 10px;
+    align-items: center;
 }
-.message-content{
+
+.message-content {
     font-size: 20px;
     font-weight: bold;
     color: #2a1987;
 }
-.message-date{
+
+.user-status-dot {
+    width: 17px;
+    display: block;
+    height: 17px;
+    background: red;
+    border-radius: 50%;
+    position: absolute;
+    left: 53px;
+    top: 9px;
+}
+
+.message-date {
     text-align: right;
     font-size: 14px;
+}
+
+.btn-primary {
+    background-color: #0d6efd;
+}
+
+.btn-secondary {
+    background-color: #565e64;
+}
+
+.offline-status {
+    background: red;
+}
+
+.online-status {
+    background: green;
 }

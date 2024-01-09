@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\MessageDeleteEvent;
 use App\Events\MessageEvent;
 use App\Models\Chat;
 use Illuminate\Http\Request;
@@ -36,7 +37,7 @@ class ChatController extends Controller
             $html = '';
             foreach ($chats as $chat) {
                 if ($chat->sender_id == auth()->user()->id) {
-                    $html .= '<div class="current-user-message">
+                    $html .= '<div id="chat-' . $chat->id . '" class="current-user-message">
                     <div class="current-user-info-box">
                         <div class="content">
                             <p class="message-content" >' . $chat->message . '</p>
@@ -47,10 +48,11 @@ class ChatController extends Controller
                         src="http://127.0.0.1:8000/dummy-user.png" alt="User Image">
                         </div>
                     </div>
+                    <div><i  style="cursor:pointer" class="fa fa-trash text-danger delete-message" data-message-id="' . $chat->id . '" id="chat-' . $chat->id . '" data-message-body="' . $chat->message . '" > </i></div>
 
                 </div>';
                 } else {
-                    $html .= '<div class="recepient-user-message">
+                    $html .= '<div id="chat-' . $chat->id . '" class="recepient-user-message">
                     <div class="current-user-info-box">
                         <div class="img">
                             <img width="50"
@@ -70,5 +72,18 @@ class ChatController extends Controller
         }
 
         return response()->json(['success' => true, 'data' => $html]);
+    }
+
+    public function DeleteMessage(Request $req)
+    {
+        try {
+            $chat = Chat::where('id', $req->message_id)->first();
+            // dd($req->message_id);
+            $chat->delete();
+            event(new MessageDeleteEvent($req->message_id));
+            return response()->json(['success' => true, 'data' => 'Message Deleted Successfully']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => true, 'data' => $e->getMessage()]);
+        }
     }
 }

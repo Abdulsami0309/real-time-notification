@@ -22,3 +22,6 @@ Broadcast::channel('status-update', function ($user) {
 Broadcast::channel('get-message', function ($user) {
     return $user;
 });
+Broadcast::channel('delete-single-message', function ($user) {
+    return $user;
+});

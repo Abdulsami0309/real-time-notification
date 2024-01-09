@@ -30,5 +30,6 @@ Route::middleware('auth')->group(function () {
 
 Route::post('save-chat',[ChatController::class,'saveChat']);
 Route::post('load-receiver-old-chats',[ChatController::class,'loadOldChats']);
+Route::post('delete-current-user-message',[ChatController::class,'DeleteMessage']);
 
 require __DIR__ . '/auth.php';
