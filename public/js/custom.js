@@ -1,5 +1,3 @@
-
-
 $.ajaxSetup({
     headers: {
         "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
@@ -8,6 +6,7 @@ $.ajaxSetup({
 var audio = new Audio("message-alert-tune.mp3");
 
 $(document).ready(function () {
+    //Set Receiver and Show Old Chats
     $(".single-user").on("click", function () {
         receiver_id = $(this).data("id");
         var username = $("#user-" + receiver_id + "-name").text();
@@ -15,6 +14,7 @@ $(document).ready(function () {
         loadOldChats(receiver_id);
     });
 
+    //Show Delete Message Popup
     $(document).on("click", ".delete-message", function () {
         var messageBody = $(this).data("message-body");
         var messageId = $(this).data("message-id");
@@ -27,16 +27,16 @@ $(document).ready(function () {
         $("#message-confirm-popup").modal("show");
     });
 
-
+    //Show Update Message Popup
     $(document).on("click", ".update-message", function () {
-        
         var messageId = $(this).data("message-id");
-        var messageBody = $("#message-"+messageId).text();
+        var messageBody = $("#message-" + messageId).text();
         $("#message-id").val(messageId);
         $("#update-chat-message").val(messageBody);
         $("#update-message-confirm-popup").modal("show");
     });
 
+    //Send Message To Receiver Realtime
     $("#send-message-form").on("submit", function (e) {
         e.preventDefault();
         var message = $("#chat-input").val();
@@ -78,6 +78,7 @@ $(document).ready(function () {
         });
     });
 
+    // Delete Message Realtime
     $("#message-delete-form").on("submit", function (e) {
         e.preventDefault();
         var message_id = $("#message-id").val();
@@ -99,7 +100,7 @@ $(document).ready(function () {
         });
     });
 
-
+    // Update Message Realtime
     $("#update-message-form").on("submit", function (e) {
         e.preventDefault();
         var message_id = $("#message-id").val();
@@ -124,6 +125,7 @@ $(document).ready(function () {
     });
 });
 
+// Catch Users Activity Who Is online and Offline
 Echo.join("status-update")
     .here((users) => {
         for (let x = 0; x < users.length; x++) {
@@ -131,23 +133,19 @@ Echo.join("status-update")
                 "offline-status"
             );
             $("#user-" + users[x]["id"] + "-status").addClass("online-status");
-            // $("#user-" + users[x]["id"] + "-status").text("Online");
         }
     })
     .joining((user) => {
         $("#user-" + user.id + "-status").removeClass("offline-status");
         $("#user-" + user.id + "-status").addClass("online-status");
-        // $("#user-" + user.id + "-status").text("Online");
     })
     .leaving((user) => {
         $("#user-" + user.id + "-status").addClass("offline-status");
         $("#user-" + user.id + "-status").removeClass("online-status");
-        // $("#user-" + user.id + "-status").text("Offline");
     })
-    .listen("UserStatusEvent", (e) => {
-        // console.log("hhh" + e);
-    });
+    .listen("UserStatusEvent", (e) => {});
 
+// Get The Message Event Catching
 Echo.private("get-message").listen(".getMessage", (data) => {
     if (data.messageData.receiver_id == sender_id) {
         var html = `<div id="chat-${data.messageData.id}" class="recepient-user-message">
@@ -170,15 +168,17 @@ Echo.private("get-message").listen(".getMessage", (data) => {
     }
 });
 
+// Catch Message Deleted Event
 Echo.private("delete-single-message").listen("MessageDeleteEvent", (data) => {
     $("#chat-" + data.data).remove();
 });
 
-Echo.private('update-message').listen('UpdateMessageEvent',(data)=>{
-$("#message-"+data.data.id).text(data.data.message)
-
+// Catch Message Updated Event
+Echo.private("update-message").listen("UpdateMessageEvent", (data) => {
+    $("#message-" + data.data.id).text(data.data.message);
 });
 
+// Load Old Chats Function
 function loadOldChats(receiver_id) {
     $.ajax({
         type: "POST",
