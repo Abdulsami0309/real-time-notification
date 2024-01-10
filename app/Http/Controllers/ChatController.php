@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\MessageDeleteEvent;
-use App\Events\MessageEvent;
 use App\Models\Chat;
+use App\Events\MessageEvent;
 use Illuminate\Http\Request;
+use App\Events\MessageDeleteEvent;
+use App\Events\UpdateMessageEvent;
 
 class ChatController extends Controller
 {
@@ -40,7 +41,7 @@ class ChatController extends Controller
                     $html .= '<div id="chat-' . $chat->id . '" class="current-user-message">
                     <div class="current-user-info-box">
                         <div class="content">
-                            <p class="message-content" >' . $chat->message . '</p>
+                            <p id="message-' . $chat->id . '" class="message-content" >' . $chat->message . '</p>
                             <p class="message-date">' . $chat->created_at->format('d-m-Y h:i:s A') . '</p>
                         </div>
                         <div class="img">
@@ -48,7 +49,10 @@ class ChatController extends Controller
                         src="http://127.0.0.1:8000/dummy-user.png" alt="User Image">
                         </div>
                     </div>
-                    <div><i  style="cursor:pointer" class="fa fa-trash text-danger delete-message" data-message-id="' . $chat->id . '" id="chat-' . $chat->id . '" data-message-body="' . $chat->message . '" > </i></div>
+                    <div>
+                    <i  style="cursor:pointer" class="fa fa-trash text-danger delete-message" data-message-id="' . $chat->id . '" id="chat-' . $chat->id . '" data-message-body="' . $chat->message . '" > </i>
+                    <i  style="cursor:pointer" class="fa fa-edit text-success update-message" data-message-id="' . $chat->id . '" data-message-body="' . $chat->message . '" > </i>
+                    </div>
 
                 </div>';
                 } else {
@@ -59,7 +63,7 @@ class ChatController extends Controller
                         src="http://127.0.0.1:8000/dummy-user.png" alt="User Image">
                         </div>
                         <div class="content">
-                            <p class="message-content" >' . $chat->message . '</p>
+                            <p id="message-' . $chat->id . '" class="message-content" >' . $chat->message . '</p>
                             <p class="">' . $chat->created_at->format('d-m-Y h:i:s A') . '</p>
                         </div>
                         
@@ -85,5 +89,16 @@ class ChatController extends Controller
         } catch (\Exception $e) {
             return response()->json(['success' => true, 'data' => $e->getMessage()]);
         }
+    }
+
+    public function UpdateMessage(Request $req)
+    {
+        Chat::where('id', $req->message_id)->update([
+            'message' => $req->update_chat_message
+        ]);
+        $chat = Chat::find($req->message_id);
+        //Trigger The Update To The Update Channel
+        event(new UpdateMessageEvent($chat));
+        return response()->json(['success' => true, 'data' => 'Message Updated Successfully']);
     }
 }

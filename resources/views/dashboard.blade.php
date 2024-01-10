@@ -1,8 +1,8 @@
 <x-app-layout>
 
-
+    {{-- Delete Chat Modal Confirmation Popup --}}
     <div class="modal fade" id="message-confirm-popup" tabindex="-1">
-        <form id="message-delete-form" >
+        <form id="message-delete-form">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -22,6 +22,29 @@
         </form>
     </div>
 
+    {{-- Update Chat Modal Popup --}}
+    <div class="modal fade" id="update-message-confirm-popup" tabindex="-1">
+        <form id="update-message-form">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit Message</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" id="message-id" name="message_id">
+                        <input type="text" id="update-chat-message" class="form-control">
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Update</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
     <div class="container mt-4">
         <div class="row">
             <div class="col-sm-3 col-md-5 col-lg-3">
@@ -34,9 +57,10 @@
                             @forelse($users as $user)
                                 <li data-id="{{ $user->id }}" class="list-group-item single-user"><img
                                         width="50" src="{{ asset('dummy-user.png') }}" alt="User Image">
-                                    <span id="user-{{$user->id}}-name" >{{ $user->name }}
-                                        <span id="user-{{ $user->id }}-status" class="user-status-dot" ></span>
-                                    </span> </li>
+                                    <span id="user-{{ $user->id }}-name">{{ $user->name }}
+                                        <span id="user-{{ $user->id }}-status" class="user-status-dot"></span>
+                                    </span>
+                                </li>
                             @empty
                                 <li class="list-group-item">No User Found !</li>
                             @endforelse
@@ -48,7 +72,7 @@
             <div class="col-sm-9 col-md-7 col-lg-9" id="chat-with-user-area">
                 <div class="card">
                     <div class="card-header" id="set-username">
-                        
+
                     </div>
                     <div class="card-body">
                         <div id="chat-area">

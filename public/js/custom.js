@@ -1,3 +1,5 @@
+
+
 $.ajaxSetup({
     headers: {
         "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
@@ -25,6 +27,16 @@ $(document).ready(function () {
         $("#message-confirm-popup").modal("show");
     });
 
+
+    $(document).on("click", ".update-message", function () {
+        
+        var messageId = $(this).data("message-id");
+        var messageBody = $("#message-"+messageId).text();
+        $("#message-id").val(messageId);
+        $("#update-chat-message").val(messageBody);
+        $("#update-message-confirm-popup").modal("show");
+    });
+
     $("#send-message-form").on("submit", function (e) {
         e.preventDefault();
         var message = $("#chat-input").val();
@@ -44,14 +56,17 @@ $(document).ready(function () {
                     var html = `<div id="chat-${response.data.id}" class="current-user-message">
                     <div  class="current-user-info-box">
                         <div class="content">
-                            <p class="message-content" >${message}</p>
+                            <p id="message-${response.data.id}" class="message-content" >${message}</p>
                             <p class="message-date">${response.data.created_at}</p>
                         </div>
                         <div class="img">
                             <img width="50"
                         src="http://127.0.0.1:8000/dummy-user.png" alt="User Image">
                         </div>
-                        <div><i  style="cursor:pointer" data-message-id="${response.data.id}" class="fa fa-trash text-danger delete-message" id="chat-${response.data.id}" data-message-body="${response.data.message}" > </i></div>
+                        <div>
+                        <i  style="cursor:pointer" data-message-id="${response.data.id}" class="fa fa-trash text-danger delete-message" id="chat-${response.data.id}" data-message-body="${response.data.message}" > </i>
+                        <i  style="cursor:pointer" data-message-id="${response.data.id}" class="fa fa-edit text-success update-message" data-message-body="${response.data.message}" > </i>
+                        </div>
                     </div>
 
                 </div>`;
@@ -76,6 +91,30 @@ $(document).ready(function () {
                 if (res.success) {
                     $("#chat-" + message_id).remove();
                     $("#message-confirm-popup").modal("hide");
+                    toastr.success(res.data);
+                } else {
+                    console.log(res.data);
+                }
+            },
+        });
+    });
+
+
+    $("#update-message-form").on("submit", function (e) {
+        e.preventDefault();
+        var message_id = $("#message-id").val();
+        var update_chat_message = $("#update-chat-message").val();
+        $.ajax({
+            type: "POST",
+            url: "/update-current-user-message",
+            data: {
+                message_id,
+                update_chat_message,
+            },
+            success: function (res) {
+                if (res.success) {
+                    // $("#chat-" + message_id).text();
+                    $("#update-message-confirm-popup").modal("hide");
                     toastr.success(res.data);
                 } else {
                     console.log(res.data);
@@ -133,6 +172,11 @@ Echo.private("get-message").listen(".getMessage", (data) => {
 
 Echo.private("delete-single-message").listen("MessageDeleteEvent", (data) => {
     $("#chat-" + data.data).remove();
+});
+
+Echo.private('update-message').listen('UpdateMessageEvent',(data)=>{
+$("#message-"+data.data.id).text(data.data.message)
+
 });
 
 function loadOldChats(receiver_id) {
